@@ -15,25 +15,33 @@ namespace TrelloImport
 
         static void Main(string[] args)
         {
-            // Console.WriteLine("Hello World!");
-
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
                                                     .AddJsonFile("appsettings.json");
 
             var configuration = builder.Build();
 
-            String ApiKey = configuration.GetSection("ApiKey").Value;
-            String ApiToken = configuration.GetSection("ApiToken").Value;
-            
-            String Path = "https://api.trello.com/1/members/me/";
-            Path = Path + "?key="+ApiKey + "&token="+ApiToken;
+            String apiKey = configuration.GetSection("ApiKey").Value;
+            String apiToken = configuration.GetSection("ApiToken").Value;
+            String path = configuration.GetSection("Path").Value;
 
-            RunAsync(Path).GetAwaiter().GetResult();
+            if (!path.Contains("key"))
+            {
+                path += !path.Contains("?") ? "?key=" : "&key=";
+                path += apiKey;
+            }
+
+            if (!path.Contains("token"))
+            {
+                path += !path.Contains("?") ? "?token=" : "&token=";
+                path += apiToken;
+            }
+
+            RunAsync(path).GetAwaiter().GetResult();
         }
 
         static async Task<Trello> GetTrelloAsync(string path)
-        {   
-            Trello trello = null;            
+        {
+            Trello trello = null;
             HttpResponseMessage response = await client.GetAsync(path);
 
             if (response.IsSuccessStatusCode)
@@ -53,7 +61,7 @@ namespace TrelloImport
             try
             {
                 Trello trello = await GetTrelloAsync(client.BaseAddress.AbsoluteUri);
-                PrintJson(trello);
+                PrintJson(path, trello);
             }
             catch (Exception e)
             {
@@ -63,15 +71,19 @@ namespace TrelloImport
             Console.ReadLine();
         }
 
-        private static void PrintJson(Trello trello)
-        {            
-            Console.WriteLine($"id: {trello.id}" +
-                              $"\tname:{trello.name}" +
-                              $"\tdesc:{trello.desc}" +
-                              $"\tdescData:{trello.descData}" +
-                              $"\tclosed:{trello.closed}" +
-                              $"\tidOrganization:{trello.idOrganization}" +
-                              $"\turl: {trello.url}");
+        private static void PrintJson(String path, Trello trello)
+        {
+            Console.WriteLine("*****Endpoint*****");
+            Console.WriteLine(path);
+
+            Console.Write("\n*****Return*****");
+            Console.Write($"\nid: {trello.id}" +
+                          $"\nname:{trello.name}" +
+                          $"\ndesc:{trello.desc}" +
+                          $"\ndescData:{trello.descData}" +
+                          $"\nclosed:{trello.closed}" +
+                          $"\nidOrganization:{trello.idOrganization}" +
+                          $"\nurl: {trello.url}");
         }
     }
 }
