@@ -23,6 +23,9 @@ namespace TrelloImport
             String apiKey = configuration.GetSection("ApiKey").Value;
             String apiToken = configuration.GetSection("ApiToken").Value;
             String path = configuration.GetSection("Path").Value;
+            String boardId = configuration.GetSection("BoardId").Value;
+
+            path = path.Replace("{BoardId}",boardId);
 
             if (!path.Contains("key"))
             {
