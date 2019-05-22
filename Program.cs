@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -79,14 +80,21 @@ namespace TrelloImport
             Console.WriteLine("*****Endpoint*****");
             Console.WriteLine(path);
 
-            Console.Write("\n*****Return*****");
-            Console.Write($"\nid: {trello.id}" +
-                          $"\nname:{trello.name}" +
-                          $"\ndesc:{trello.desc}" +
-                          $"\ndescData:{trello.descData}" +
-                          $"\nclosed:{trello.closed}" +
-                          $"\nidOrganization:{trello.idOrganization}" +
-                          $"\nurl: {trello.url}");
+            // Console.Write("\n*****Return*****");
+            // Console.Write($"\nid: {trello.id}" +
+            //               $"\nname:{trello.name}" +
+            //               $"\nclosed:{trello.closed}" +
+            //               $"\nurl:{trello.url}" +
+            //               $"\nshortUrl:{trello.shortUrl}" +
+            //               $"\nurl: {trello.url}");
+
+            Console.Write("\n*****Return*****\n");
+            foreach(PropertyDescriptor descriptor in TypeDescriptor.GetProperties(trello))
+            {
+                string name=descriptor.Name;
+                object value=descriptor.GetValue(trello);
+                Console.WriteLine("{0}: {1}",name,value);
+            }
         }
     }
 }
